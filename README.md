@@ -85,7 +85,7 @@ MicroSD Card Adapterについているピンヘッダを除去してハンダ付
 
 　外れ難いということは、使っている分には外れないという安心感があります。
 
-## ROMの書込み
+## ROMへの書込み
 　SDアクセス用プログラムはTK-80BS_SDと共用です。
 
 　まず、MONITOR-ROMの内容を読み出し、バイナリエディタ等で以下の修正をします。
@@ -106,7 +106,7 @@ MicroSD Card Adapterについているピンヘッダを除去してハンダ付
 
 　ROMに焼き、EXT-BOARDに装着します。
 
-## Arduinoプログラム
+## Arduinoへの書込み
 　Arduino用プログラムもTK-80BS_SDと共用です。
 
 　Arduino IDEを使ってTK-80BS_SDリポジトリArduinoフォルダTK-80_SDフォルダ内TK-80_SD.inoを書き込みます。
@@ -132,7 +132,7 @@ MicroSD Card Adapterについているピンヘッダを除去してハンダ付
 　異常が無いと思われるのにエラーとなってしまう場合にはSD-CardアダプタのArduinoとTK-85の両方をリセットしてからやり直してみてください。
 
 ### Save
-　ファイルNo(xxxx)を4桁で入力してWR/ENTキーを押します。
+　4桁のファイルNo(xxxx)をデータ表示部のLEDに入力してSTORE DATAを押します。
 
 　正常にSaveが完了するとアドレス部にスタートアドレス、データ部にエンドアドレスが表示されます。
 
@@ -141,7 +141,7 @@ MicroSD Card Adapterについているピンヘッダを除去してハンダ付
 　「FFFFFFFF」と表示された場合はSD-Card未挿入です。確認してください。
 
 ### Load
-　ファイルNo(xxxx)を4桁で入力してWR/ENTキーを押します。
+　4桁のファイルNo(xxxx)をデータ表示部のLEDに入力してLOAD DATAキーを押します。
 
 　　　xxxx.BTKをBTKヘッダ情報で示されたアドレスにロードします。ただし、8391H～83FFHまでの範囲はライトプロテクトされます。
 
