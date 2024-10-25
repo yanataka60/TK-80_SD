@@ -1,0 +1,340 @@
+			  Z80 ASSEMBLER - ZASM VER 1.6
+  83EC                	LEDREG		EQU		83ECH      ;TK80 MONITOR
+  01A1                	RGDSP		EQU		01A1H      ;TK80 MONITOR
+  0051                	MONST		EQU		0051H      ;TK80 MONITOR
+  7C6F                	MIN			EQU		7C6FH      ;TK80 WORK -(8391H)
+  7C00                	MAX			EQU		7C00H      ;TK80 WORK -(83FFH+1)
+                      	
+  83E6                	FNAME		EQU		83E6H      ;DEレジスタセーブエリアを流用
+  83E8                	SADRS		EQU		83E8H      ;BCレジスタセーブエリアを流用
+  83EA                	EADRS		EQU		83EAH      ;AFレジスタセーブエリアを流用
+                      	
+                      	;F9H PORTB Bit(INPUT)
+                      	;7 IN			A37
+                      	;6 IN			A36
+                      	;5 IN			A35
+                      	;4 IN			A34
+                      	;3 IN			A33
+                      	;2 IN CHK		A32		9(FLG)
+                      	;1 IN			A31
+                      	;0 IN 受信データ	A30		8(OUT)
+                      	
+                      	;FAH PORTC Bit(OUTPUT)
+                      	;7 OUT
+                      	;6 OUT
+                      	;5 OUT
+                      	;4 OUT
+                      	;3 OUT 			A41
+                      	;2 OUT	FLG		A40		7(CHK)
+                      	;1 OUT			A39
+                      	;0 OUT 送信データ	A38		6(IN)
+                      	
+  0300                			ORG		0300H
+                      	
+  0300  C34F03        	JP1:	JP		SDSAVE		;TK-80 SDSAVE
+  0303  C31803        	JP2:	JP		SDLOAD		;TK-80 SDLOAD
+  0306                			DS		18
+                      	
+                      	;TK-80 受信ヘッダ情報をセットし、SDカードからLOAD実行
+                      	;FNAME <- 0000H～FFFFHを入力。
+                      	;         ファイルネームは「xxxx.BTK」となる。
+  0318  CDC604        	SDLOAD:	CALL	INIT
+  031B  3E81          			LD		A,81H
+  031D  CD4304        			CALL	SNDBYTE    ;LOADコマンド81Hを送信
+  0320  CD6D04        			CALL	RCVBYTE    ;状態取得(00H=OK)
+  0323  A7            			AND		A          ;00以外ならERROR
+  0324  C28B03        			JP		NZ,SVERR
+  0327  21E683        			LD		HL,FNAME   ;FNAME <- LEDREG
+  032A  11EC83        	TKMODE5:LD		DE,LEDREG
+  032D  1A            	TKMD5:	LD		A,(DE)     ;FNAME取得
+  032E  77            			LD		(HL),A
+  032F  23            			INC		HL
+  0330  13            			INC		DE
+  0331  1A            			LD		A,(DE)
+  0332  77            			LD		(HL),A
+  0333  21E683        			LD		HL,FNAME   ;FNAME送信
+  0336  7E            			LD		A,(HL)
+  0337  CD4304        			CALL	SNDBYTE
+  033A  23            			INC		HL
+  033B  7E            			LD		A,(HL)
+  033C  CD4304        			CALL	SNDBYTE
+  033F  CD6D04        			CALL	RCVBYTE    ;状態取得(00H=OK)
+  0342  A7            			AND		A          ;00以外ならERROR
+  0343  C28B03        			JP		NZ,SVERR
+  0346  CDF503        			CALL	HDRCV      ;ヘッダ情報受信
+  0349  CD0E04        			CALL	DBRCV      ;データ受信
+  034C  C38503        			JP		SDSV3      ;LOAD情報表示
+                      	
+                      	;TK-80 送信ヘッダ情報をセットし、SDカードへSAVE実行
+                      	;FNAME <- 0000H～FFFFHを入力。
+                      	;         ファイルネームは「xxxx.BTK」となる。
+                      	;SADRS <- 保存開始アドレス(8000H固定)
+                      	;EADRS <- 保存終了アドレス(8390H固定)
+                      	
+  034F  21E883        	SDSAVE:	LD		HL,SADRS
+  0352  3600          			LD		(HL),00H
+  0354  23            			INC		HL
+  0355  3680          			LD		(HL),80H   ;SADRS <- 8000H
+  0357  23            			INC		HL         ;HL <- EADRS
+  0358  3690          			LD		(HL),090H
+  035A  23            			INC		HL
+  035B  3683          			LD		(HL),083H  ;EADRS <- 8390H
+  035D  CDC604        			CALL	INIT
+  0360                	SDSAVE2:
+  0360  3E80          			LD		A,80H
+  0362  CD4304        			CALL	SNDBYTE    ;SAVEコマンド80Hを送信
+  0365  CD6D04        			CALL	RCVBYTE    ;状態取得(00H=OK)
+  0368  A7            			AND		A          ;00以外ならERROR
+  0369  C28B03        			JP		NZ,SVERR
+  036C  21E683        			LD		HL,FNAME   ;FNAME <- LEDREG
+  036F  11EC83        	TKMODE4:LD		DE,LEDREG
+  0372  1A            	TKMD4:	LD		A,(DE)     ;FNAME取得
+  0373  77            			LD		(HL),A
+  0374  23            			INC		HL
+  0375  13            			INC		DE
+  0376  1A            			LD		A,(DE)
+  0377  77            			LD		(HL),A
+  0378  CD9103        			CALL	HDSEND     ;ヘッダ情報送信
+  037B  CD6D04        			CALL	RCVBYTE    ;状態取得(00H=OK)
+  037E  A7            			AND		A          ;00以外ならERROR
+  037F  C28B03        			JP		NZ,SVERR
+  0382  CDA003        			CALL	DBSEND     ;データ送信
+  0385  CDDB03        	SDSV3:	CALL	OKDSP      ;SAVE情報表示
+  0388  C35100        	MONRET:	JP		MONST;MONITOR復帰(TK85)
+                      	
+  038B  CD3404        	SVERR:	CALL	ERRDSP     ;FFH:FILE OPEN ERROR F0H:SDカード初期化ERROR
+  038E  C38803        			JP		MONRET     ;F1H;FILE存在ERROR
+                      	
+                      	;ヘッダ送信
+  0391  0606          	HDSEND:	LD		B,06H
+  0393  21E683        			LD		HL,FNAME   ;FNAME送信、SADRS送信、EADRS送信
+  0396  7E            	HDSD1:	LD		A,(HL)
+  0397  CD4304        			CALL	SNDBYTE
+  039A  23            			INC		HL
+  039B  05            			DEC		B
+  039C  C29603        			JP		NZ,HDSD1
+  039F  C9            			RET
+                      	
+                      	;データ送信
+                      	;SADRSからEADRSまでを送信
+  03A0  2AEA83        	DBSEND:	LD		HL,(EADRS)
+  03A3  EB            			EX		DE,HL
+  03A4  2AE883        			LD		HL,(SADRS)
+  03A7  7E            	DBSLOP:	LD		A,(HL)
+  03A8  CDBD03        			CALL	ADRSDSP
+  03AB  CD4304        			CALL	SNDBYTE
+  03AE  7C            			LD		A,H
+  03AF  BA            			CP		D
+  03B0  C2B803        			JP		NZ,DBSLP1
+  03B3  7D            			LD		A,L
+  03B4  BB            			CP		E
+  03B5  CABC03        			JP		Z,DBSLP2   ;HL = DE までLOOP
+  03B8  23            	DBSLP1:	INC		HL
+  03B9  C3A703        			JP		DBSLOP
+  03BC  C9            	DBSLP2:	RET
+                      	
+                      	;SAVE、LOAD中経過表示
+  03BD                	ADRSDSP:
+  03BD  E5            			PUSH	HL
+  03BE  D5            			PUSH	DE
+  03BF  F5            			PUSH	AF
+  03C0  EB            			EX		DE,HL      ;LEDREG <- 現在ADRS
+  03C1  21EC83        			LD		HL,LEDREG
+  03C4  1A            			LD		A,(DE)
+  03C5  77            			LD		(HL),A
+  03C6  13            			INC		DE
+  03C7  23            			INC		HL
+  03C8  1A            			LD		A,(DE)
+  03C9  77            			LD		(HL),A
+  03CA  23            			INC		HL
+  03CB  11E883        			LD		DE,SADRS   ;LEDREG+2 <- SADRS
+  03CE  1A            			LD		A,(DE)
+  03CF  77            			LD		(HL),A
+  03D0  13            			INC		DE
+  03D1  23            			INC		HL
+  03D2  1A            			LD		A,(DE)
+  03D3  77            			LD		(HL),A
+  03D4  CDA101        			CALL	RGDSP
+  03D7  F1            			POP		AF
+  03D8  D1            			POP		DE
+  03D9  E1            			POP		HL
+  03DA  C9            			RET
+                      	
+                      	;SAVE、LOAD正常終了ならSADRS、EADRSをLEDに表示
+  03DB                	OKDSP:
+  03DB  21EC83        	TKMODE6:LD		HL,LEDREG
+  03DE  11EA83        	TKMD6:	LD		DE,EADRS  ;LEDREG <- EADRS
+  03E1  1A            			LD		A,(DE)
+  03E2  77            			LD		(HL),A
+  03E3  13            			INC		DE
+  03E4  23            			INC		HL
+  03E5  1A            			LD		A,(DE)
+  03E6  77            			LD		(HL),A
+  03E7  23            			INC		HL
+  03E8  11E883        			LD		DE,SADRS  ;LEDREG+2 <- SADRS
+  03EB  1A            			LD		A,(DE)
+  03EC  77            			LD		(HL),A
+  03ED  13            			INC		DE
+  03EE  23            			INC		HL
+  03EF  1A            			LD		A,(DE)
+  03F0  77            			LD		(HL),A
+  03F1                	OKDSP2:	
+  03F1  CDA101        	TKMODE2:CALL	RGDSP
+  03F4  C9            			RET
+                      	
+                      	;ヘッダ受信(スタートアドレス、終了アドレス)
+  03F5  21E983        	HDRCV:	LD		HL,SADRS+1 ;SADRS取得
+  03F8  CD6D04        			CALL	RCVBYTE
+  03FB  77            			LD		(HL),A
+  03FC  2B            			DEC		HL
+  03FD  CD6D04        			CALL	RCVBYTE
+  0400  77            			LD		(HL),A
+  0401  21EB83        			LD		HL,EADRS+1 ;EADRS取得
+  0404  CD6D04        			CALL	RCVBYTE
+  0407  77            			LD		(HL),A
+  0408  2B            			DEC		HL
+  0409  CD6D04        			CALL	RCVBYTE
+  040C  77            			LD		(HL),A
+  040D  C9            			RET
+                      	
+                      	;データ受信
+  040E  2AEA83        	DBRCV:	LD		HL,(EADRS)
+  0411  EB            			EX		DE,HL
+  0412  2AE883        			LD		HL,(SADRS)
+  0415                	DBRLOP:
+  0415  CDBD03        			CALL	ADRSDSP
+  0418  CD6D04        			CALL	RCVBYTE
+  041B  47            			LD		B,A
+  041C  CDA904        			CALL	JOGAI     ;WORKエリアを識別してSKIP
+  041F  A7            			AND		A
+  0420  C22504        			JP		NZ,SKIP
+  0423  78            			LD		A,B
+  0424  77            			LD		(HL),A
+  0425  7C            	SKIP:	LD		A,H
+  0426  BA            			CP		D
+  0427  C22F04        			JP		NZ,DBRLP1
+  042A  7D            			LD		A,L
+  042B  BB            			CP		E
+  042C  CA3304        			JP		Z,DBRLP2   ;HL = DE までLOOP
+  042F  23            	DBRLP1:	INC		HL
+  0430  C31504        			JP		DBRLOP
+  0433  C9            	DBRLP2:	RET
+                      			
+                      	;SAVE、LOADエラー終了処理(F0H又はFFHをLEDに表示)
+  0434  F5            	ERRDSP: PUSH	AF
+  0435  21EC83        	TKMODE7:LD		HL,LEDREG
+  0438  F1            	TKMD7:	POP		AF
+  0439  77            			LD		(HL),A
+  043A  23            			INC		HL
+  043B  77            			LD		(HL),A
+  043C  23            			INC		HL
+  043D  77            			LD		(HL),A
+  043E  23            			INC		HL
+  043F  77            			LD		(HL),A
+  0440  C3F103        			JP		OKDSP2
+                      	
+                      	;1BYTE送信
+                      	;Aレジスタの内容を下位BITから送信
+  0443  C5            	SNDBYTE:PUSH 	BC
+  0444  0608          			LD		B,08H
+  0446  0F            	SBLOP1:	RRCA               ;最下位BITをCフラグへ
+  0447  F5            			PUSH	AF
+  0448  D25004        			JP		NC,SBRES   ;Cフラグ = 0
+  044B  3E01          	SBSET:	LD		A,01H      ;Cフラグ = 1
+  044D  C35204        			JP		SBSND
+  0450  3E00          	SBRES:	LD		A,00H
+  0452  CD5C04        	SBSND:	CALL	SND1BIT    ;1BIT送信
+  0455  F1            			POP		AF
+  0456  05            			DEC		B
+  0457  C24604        			JP		NZ,SBLOP1  ;8BIT分LOOP
+  045A  C1            			POP		BC
+  045B  C9            			RET
+                      			
+                      	;1BIT送信
+                      	;Aレジスタ(00Hor01H)を送信する
+  045C                	SND1BIT:
+  045C  D3FB          			OUT		(0FBH),A    ;PORTC BIT0 <- A(00H or 01H)
+  045E  3E05          			LD		A,05H
+  0460  D3FB          			OUT		(0FBH),A    ;PORTC BIT2 <- 1
+  0462  CD9904        			CALL	F1CHK      ;PORTB BIT2が1になるまでLOOP
+  0465  3E04          			LD		A,04H
+  0467  D3FB          			OUT		(0FBH),A    ;PORTC BIT2 <- 0
+  0469  CDA104        			CALL	F2CHK      ;PORTB BIT2が0になるまでLOOP
+  046C  C9            			RET
+                      			
+                      	;1BYTE受信
+                      	;受信DATAをAレジスタにセットしてリターン
+  046D  C5            	RCVBYTE:PUSH 	BC
+  046E  0E00          			LD		C,00H
+  0470  0608          			LD		B,08H
+  0472  CD8404        	RBLOP1:	CALL	RCV1BIT    ;1BIT受信
+  0475  A7            			AND		A          ;A=0?
+  0476  79            			LD		A,C
+  0477  CA7B04        			JP		Z,RBRES    ;0
+  047A  3C            	RBSET:	INC		A          ;1
+  047B  0F            	RBRES:	RRCA               ;Aレジスタ右SHIFT
+  047C  4F            			LD		C,A
+  047D  05            			DEC		B
+  047E  C27204        			JP		NZ,RBLOP1  ;8BIT分LOOP
+  0481  79            			LD		A,C        ;受信DATAをAレジスタへ
+  0482  C1            			POP		BC
+  0483  C9            			RET
+                      			
+                      	;1BIT受信
+                      	;受信BITをAレジスタに保存してリターン
+  0484  CD9904        	RCV1BIT:CALL	F1CHK      ;PORTB BIT2が1になるまでLOOP
+  0487  DBF9          			IN		A,(0F9H)    ;PORTB BIT0
+  0489  E601          			AND		01H
+  048B  F5            			PUSH	AF
+  048C  3E05          			LD		A,05H
+  048E  D3FB          			OUT		(0FBH),A    ;PORTC BIT2 <- 1
+  0490  CDA104        			CALL	F2CHK      ;PORTB BIT2が0になるまでLOOP
+  0493  3E04          			LD		A,04H
+  0495  D3FB          			OUT		(0FBH),A    ;PORTC BIT2 <- 0
+  0497  F1            			POP		AF         ;受信DATAセット
+  0498  C9            			RET
+                      			
+                      	;BUSYをCHECK(1)
+                      	; 81H BIT2が1になるまでLOP
+  0499  DBF9          	F1CHK:	IN		A,(0F9H)
+  049B  E604          			AND		04H        ;PORTB BIT2 = 1?
+  049D  CA9904        			JP		Z,F1CHK
+  04A0  C9            			RET
+                      	
+                      	;BUSYをCHECK(0)
+                      	; 81H BIT2が0になるまでLOOP
+  04A1  DBF9          	F2CHK:	IN		A,(0F9H)
+  04A3  E604          			AND		04H        ;PORTB BIT2 = 0?
+  04A5  C2A104        			JP		NZ,F2CHK
+  04A8  C9            			RET
+                      	
+                      	;WORKエリアを識別
+                      	;8391H～83FFHはLOADをSKIP
+  04A9  E5            	JOGAI:		PUSH	HL
+  04AA  D5            				PUSH	DE
+  04AB  EB            				EX		DE,HL
+  04AC  216F7C        	JOGAI_TK:	LD		HL,MIN
+  04AF  19            				ADD		HL,DE
+  04B0  D2BA04        				JP		NC,JGOK    ;MIN未満ならOK
+  04B3  21007C        				LD		HL,MAX
+  04B6  19            				ADD		HL,DE
+  04B7  D2BE04        				JP		NC,JGERR   ;MAX未満ならSKIP
+  04BA  AF            	JGOK:		XOR		A          ;OKならAレジスタ=0
+  04BB  C3C304        				JP		JGRTN
+  04BE  3E01          	JGERR:		LD		A,01H      ;SKIP範囲ならAレジスタ=1
+  04C0  C3C304        				JP		JGRTN
+  04C3  D1            	JGRTN:		POP		DE
+  04C4  E1            				POP		HL
+  04C5  C9            				RET
+                      	
+                      	;8255初期化
+  04C6                	INIT:
+                      	;出力BITをリセット
+  04C6  3E92          	INIT2:	LD		A,92H
+  04C8  D3FB          			OUT		(0FBH),A
+  04CA  3E80          			LD		A,80H      ;PORTC <- 80H
+  04CC  D3FA          			OUT		(0FAH),A
+  04CE  C9            			RET
+                      			
+  04CF                			END
+
