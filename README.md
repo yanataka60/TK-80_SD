@@ -117,6 +117,17 @@ MicroSD Card Adapterについているピンヘッダを除去してハンダ付
 
 注)Arduinoを基板に直付けしている場合、Arduinoプログラムを書き込むときは、EXT-BOARDをTK-80本体から外し、GAL22V10を外したうえで書き込んでください。
 
+## GAL22V10への書込み
+　WINCUPLファルダに二通りのプログラムがあります。増設RAMの状況によりどちらかのjedファイルを選択してROMライター(TL866II Plus等)を使ってGAL22V10に書き込んでください。
+
+　(1)TK80_1(ROM 0000-3FFF,RAM 4000-7FFF)フォルダのTK80.jed
+
+　　TK-80のRAM(8000h-81FFh)を増設済みであればこちらを書き込みます。
+
+　(2)TK80_2(ROM 0000-3FFF,RAM 4000-81FF)フォルダのTK80.jed
+
+　　TK-80のRAM(8000h-81FFh)が未装着であればこちらを書き込みます。
+
 ## 操作方法
 　異常が無いと思われるのにエラーとなってしまう場合にはSD-CardアダプタのArduinoとTK-85の両方をリセットしてからやり直してみてください。
 
@@ -143,40 +154,9 @@ MicroSD Card Adapterについているピンヘッダを除去してハンダ付
 
 　ファイル名は0000～FFFFまでの16進数4桁を付けてください。(例:1000.btk)
 
-　この16進数4桁がTK-85からSD-Card内のファイルを識別するファイルNoとなります。
+　この16進数4桁がTK-80からSD-Card内のファイルを識別するファイルNoとなります。
 
 　構造的には、バイナリファイル本体データの先頭に開始アドレス、終了アドレスの4Byteのを付加した形になっています。
 
-　パソコンのクロスアセンブラ等でTK-85用の実行binファイルを作成したらバイナリエディタ等で先頭に開始アドレス、終了アドレスの4Byteを付加し、ファイル名を変更したものをSD-Cardのルートディレクトリに保存すればTK-85から呼び出せるようになります。
+　パソコンのクロスアセンブラ等でTK-80用の実行binファイルを作成したらバイナリエディタ等で先頭に開始アドレス、終了アドレスの4Byteを付加し、ファイル名を変更したものをSD-Cardのルートディレクトリに保存すればTK-80から呼び出せるようになります。
 
-## 実装
-　実際に作成したアダプタです。
-
-アダプタの表です。
-
-![SD-Cardアダプタ(表)](https://github.com/yanataka60/TK-85_SD/blob/main/JPG/SD-Card%E3%82%A2%E3%83%80%E3%83%97%E3%82%BF(%E8%A1%A8).JPG)
-
-アダプタの裏です。
-
-![SD-Cardアダプタ(裏)](https://github.com/yanataka60/TK-85_SD/blob/main/JPG/SD-Card%E3%82%A2%E3%83%80%E3%83%97%E3%82%BF(%E8%A3%8F).JPG)
-
-TK-85側のコネクタ部です。
-
-![コネクタ](https://github.com/yanataka60/TK-85_SD/blob/main/JPG/%E3%82%B3%E3%83%8D%E3%82%AF%E3%82%BF.JPG)
-
-実際に装着したところです。
-
-![装着](https://github.com/yanataka60/TK-85_SD/blob/main/JPG/%E8%A3%85%E7%9D%80.JPG)
-
-## 作成例
-junk_sugaさんが作成された例です。本体の8255ソケットを利用してスマートに仕上がっています。
-
-![装着](https://github.com/yanataka60/TK-85_SD/blob/main/JPG/junk_suga%E4%BD%9C%E6%88%90%E4%BE%8B(%E8%A1%A8).jpg)
-
-![SD-Cardアダプタ(裏)](https://github.com/yanataka60/TK-85_SD/blob/main/JPG/junk_suga%E4%BD%9C%E6%88%90%E4%BE%8B(%E8%A3%8F).jpg)
-
-## 追記
-
-2021.10.30 TK-85のワークエリアがTK-80より拡大していたことに気付いたため、セーブ範囲とロード時の除外範囲を修正
-
-2022.03.04 junk_sugaさんの作成例を載せました。
