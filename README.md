@@ -88,7 +88,7 @@ MicroSD Card Adapterについているピンヘッダを除去してハンダ付
 ## ROMへの書込み
 　SDアクセス用プログラムはTK-80BS_SDと共用です。
 
-　まず、MONITOR-ROMの内容を読み出し、バイナリエディタ等で以下の修正をします。
+　まず、MONITOR-ROM(0000h-02FFh)の内容を読み出し、バイナリエディタ等で以下の修正をします。
 
 |ADDRESS|修正前|修正後|
 | ------------ | ------------ | ------------ |
@@ -100,7 +100,7 @@ MicroSD Card Adapterについているピンヘッダを除去してハンダ付
 |0258|DF|D0|
 |0265|BF|B0|
 
-　次にMONITOR-ROMの後ろ0300hからにTK-80BS_SDリポジトリ8080フォルダ中のfile_trans_TK80BS.binを連結します。
+　次にMONITOR-ROMの後ろ(0300h～)にTK-80BS_SDリポジトリ8080フォルダ中のfile_trans_TK80BS.binを連結します。
 
 　0000h～0977h(2424Byte)までのファイルになります。
 
