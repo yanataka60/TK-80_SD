@@ -25,11 +25,15 @@
 　
 
 ## 回路図
-　KiCadフォルダ内のTK-80_EXT-BOARD.pdfを参照してください。
+　TK-80BS_SDと共通です。TK-80BS_SDリポジトリKiCadフォルダ内のTK-80_EXT-BOARD.pdfを参照してください。
 
-[回路図](https://github.com/yanataka60/TK-80_SD/blob/main/KiCad/TK-80_EXT-BOARD.pdf)
+　TK-80単体でTK-80_SDを使うときのTK-80BS_SDとの違いはROM、RAMの割り当てになります。
 
-![TK-80_SD](https://github.com/yanataka60/TK-80_SD/blob/main/KiCad/TK-80_EXT-BOARD_1.jpg)
+　ROMとRAMの状況によりGAL22V10への書込みプログラムが変わります。
+
+[回路図](https://github.com/yanataka60/TK-80BS_SD/blob/main/KiCad/TK-80_EXT-BOARD.pdf)
+
+![TK-80_SD](https://github.com/yanataka60/TK-80BS_SD/blob/main/KiCad/TK-80_EXT-BOARD_1.jpg)
 
 |番号|品名|数量|備考|
 | ------------ | ------------ | ------------ | ------------ |
@@ -44,8 +48,8 @@
 |U10|Arduino_Pro_Mini_5V|1|Atmega328版を使用 168版は不可。|
 |U2、U4、U9|Pin Header|40Pin×4、14Pin×2|秋月電子通商 細ピンヘッダーPHA-1x40SG又は基板用リードフレームBQ04-SN(注3)|
 |C1-C3|積層セラミックコンデンサ 0.1uF|3||
-|S1-S3|ピンヘッダ3Pin分|3|秋月電子通商 ピンヘッダーPH-1x40SGなど|
-|LS1|小型スピーカー|1|秋月電子通商 マイクロスピーカー|
+|S1-S3|ピンヘッダ3Pin|3|秋月電子通商 ピンヘッダーPH-1x40SGなど|
+|LS1|小型スピーカー|1|秋月電子通商 マイクロスピーカーなど|
 ||ピンソケット(任意)|26Pin分|Arduino_Pro_Miniを取り外し可能としたい場合に調達します 秋月電子通商 FHU-1x42SGなど|
 
 　　　注1)秋月電子通商　AE-microSD-LLCNVのJ1ジャンパはショートしてください。
@@ -58,10 +62,10 @@ MicroSD Card Adapterについているピンヘッダを除去してハンダ付
 
 ハンダ付けに自信のない方はJ1の秋月電子通商　AE-microSD-LLCNVをお使いください。AE-microSD-LLCNVならパワーLED、アクセスLEDが付いています。
 
-![MicroSD Card Adapter1](https://github.com/yanataka60/TK-80_SD/blob/main/JPEG/MicroSD%20Card%20Adapter.jpg)
+![MicroSD Card Adapter1]https://github.com/yanataka60/TK-80BS_SD/blob/main/JPEG/MicroSD%20Card%20Adapter.jpg)
 
 　　　注3)細ピンヘッダーと基板用リードフレームの選択
-![Pin](https://github.com/yanataka60/TK-80_SD/blob/main/JPEG/PIN.jpg)
+![Pin](https://github.com/yanataka60/TK-80BS_SD/blob/main/JPEG/PIN.jpg)
 
 どちらでも大丈夫ですが、あえて言うなら
 
@@ -71,7 +75,7 @@ MicroSD Card Adapterについているピンヘッダを除去してハンダ付
 
 　細ピンとはいえピンに厚みがあるので嵌めるのに結構力が必要です。ちゃんと嵌っていないと外れやすいです。
 
-　リードフレームより外し易いです。
+　リードフレームより外し易いです。(簡単に抜けてしまうわけではないです)
 
 〇リードフレーム
 
@@ -79,11 +83,12 @@ MicroSD Card Adapterについているピンヘッダを除去してハンダ付
 
 　嵌ってしまうとかなり外し難いです。無理に外そうとするとピンが曲がってしまうため慎重に外す必要があります。
 
-　外れ難いため、使っている分には安心感があります。
+　外れ難いということは、使っている分には外れないという安心感があります。
 
 ## ROMの書込み
+　SDアクセス用プログラムはTK-80BS_SDと共用です。
 
-　MONITOR-ROMの内容を読み出し、バイナリエディタ等で以下の修正をします。
+　まず、MONITOR-ROMの内容を読み出し、バイナリエディタ等で以下の修正をします。
 
 |ADDRESS|修正前|修正後|
 | ------------ | ------------ | ------------ |
@@ -95,14 +100,16 @@ MicroSD Card Adapterについているピンヘッダを除去してハンダ付
 |0258|DF|D0|
 |0265|BF|B0|
 
-　次にMONITOR-ROMの後ろ0300hからに8080フォルダ中のfile_trans_TK80.binを連結します。
+　次にMONITOR-ROMの後ろ0300hからにTK-80BS_SDリポジトリ8080フォルダ中のfile_trans_TK80BS.binを連結します。
 
-　0000h～04CEh(1231Byte)までのファイルになります。
+　0000h～0977h(2424Byte)までのファイルになります。
 
 　ROMに焼き、EXT-BOARDに装着します。
 
 ## Arduinoプログラム
-　Arduino IDEを使ってArduinoフォルダのTK-80_SDフォルダ内TK-80_SD.inoを書き込みます。
+　Arduino用プログラムもTK-80BS_SDと共用です。
+
+　Arduino IDEを使ってTK-80BS_SDリポジトリArduinoフォルダTK-80_SDフォルダ内TK-80_SD.inoを書き込みます。
 
 　SdFatライブラリを使用しているのでArduino IDEメニューのライブラリの管理からライブラリマネージャを立ち上げて「SdFat」をインストールしてください。
 
@@ -114,7 +121,7 @@ MicroSD Card Adapterについているピンヘッダを除去してハンダ付
 　異常が無いと思われるのにエラーとなってしまう場合にはSD-CardアダプタのArduinoとTK-85の両方をリセットしてからやり直してみてください。
 
 ### Save
-　MODEキー、SAVEキーを押してからファイルNo(xxxx)を4桁で入力してWR/ENTキーを押します。
+　ファイルNo(xxxx)を4桁で入力してWR/ENTキーを押します。
 
 　正常にSaveが完了するとアドレス部にスタートアドレス、データ部にエンドアドレスが表示されます。
 
@@ -123,7 +130,7 @@ MicroSD Card Adapterについているピンヘッダを除去してハンダ付
 　「FFFFFFFF」と表示された場合はSD-Card未挿入です。確認してください。
 
 ### Load
-　MODEキー、LOADキーを押してからファイルNo(xxxx)を4桁で入力してWR/ENTキーを押します。
+　ファイルNo(xxxx)を4桁で入力してWR/ENTキーを押します。
 
 　　　xxxx.BTKをBTKヘッダ情報で示されたアドレスにロードします。ただし、8391H～83FFHまでの範囲はライトプロテクトされます。
 
