@@ -114,10 +114,11 @@ MicroSD Card Adapterについているピンヘッダを除去してハンダ付
 ![27256](https://github.com/yanataka60/TK-80_SD/blob/main/JPEG/ROM27256.JPG)
 
 2764
-![2764](https://github.com/yanataka60/TK-80_SD/blob/main/JPEG/ROM27256.JPG)
+![2764](https://github.com/yanataka60/TK-80_SD/blob/main/JPEG/ROM2764.JPG)
 
 2732
-![2732](https://github.com/yanataka60/TK-80_SD/blob/main/JPEG/ROM27256.JPG)
+![2732](https://github.com/yanataka60/TK-80_SD/blob/main/JPEG/ROM2732.JPG)
+2732の場合、右に寄せて挿入します。
 
 ## Arduinoへの書込み
 　Arduino用プログラムもTK-80BS_SDと共用です。
