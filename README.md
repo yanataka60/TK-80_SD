@@ -59,7 +59,7 @@ MicroSD Card Adapterについているピンヘッダを除去してハンダ付
 
 ![MicroSD Card Adapter1](https://github.com/yanataka60/TK-80BS_SD/blob/main/JPEG/MicroSD%20Card%20Adapter.jpg)
 
-### 注3)TK-80BS_SDではArduino Pro MiniのA4、A5ピンは使用しません。
+### 注3)TK-80BS_SD(TK-80_SD)ではArduino Pro MiniのA4、A5ピンは使用しません。
 
 ### 注4)8080Aは左側、8228と8255は上側がピンヘッダーです。基板表面に各ICのICソケットをハンダ付けする前に基板裏面からピンヘッダーを挿し、基板表面でハンダ付けします。
 
