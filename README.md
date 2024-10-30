@@ -47,9 +47,9 @@
 |LS1|小型スピーカー|1|秋月電子通商 マイクロスピーカー又は圧電スピーカーPT08-Z185Rなど|
 ||ピンソケット(任意)|12Pin×2|Arduino_Pro_Miniを取り外し可能としたい場合に調達します 秋月電子通商 FHU-1x42SGなど|
 
-　　　注1)秋月電子通商　AE-microSD-LLCNVのJ1ジャンパはショートしてください。
+### 注1)秋月電子通商　AE-microSD-LLCNVのJ1ジャンパはショートしてください。
 
-　　　注2)MicroSD Card Adapterを使う場合
+### 注2)MicroSD Card Adapterを使う場合
 
 　　　　　J2に取り付けます。
 
@@ -59,9 +59,11 @@ MicroSD Card Adapterについているピンヘッダを除去してハンダ付
 
 ![MicroSD Card Adapter1](https://github.com/yanataka60/TK-80BS_SD/blob/main/JPEG/MicroSD%20Card%20Adapter.jpg)
 
-　　　注3)TK-80BS_SDではArduino Pro MiniのA4、A5ピンは使用しません。
+### 注3)TK-80BS_SDではArduino Pro MiniのA4、A5ピンは使用しません。
 
-　　　注4)細ピンヘッダーと基板用リードフレームの選択
+### 注4)8080Aは左側、8228と8255は上側がピンヘッダーです。基板表面に各ICのICソケットをハンダ付けする前に基板裏面からピンヘッダーを挿し、基板表面でハンダ付けします。
+
+細ピンヘッダーと基板用リードフレームの選択
 ![Pin](https://github.com/yanataka60/TK-80BS_SD/blob/main/JPEG/PIN.jpg)
 
 どちらでも大丈夫ですが、あえて言うなら
